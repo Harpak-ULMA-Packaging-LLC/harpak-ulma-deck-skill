@@ -20,7 +20,16 @@ const C = {
   navy: "0C1B33", navySurface: "13253F", navyBorder: "24374F",
   teal: "00E3CC",
   cardDark: "141719", borderDark: "26282B", chipDark: "1B1E20",
+  glyphNeutral: "9BA1A7",   // 6.A.10.4: glyph tier on dark, 8.0:1 on ink
+  eyebrowDark: "FF5A46",    // PROPOSED (v0.4 6.A.10.4): dark-surface eyebrow text, 6.8:1 on ink
 };
+// Equipment glyph aspect ratios (width/height), canvas height 64 (6.A.10.3)
+const GLYPH_AR = {
+  weigher: 64 / 64, thermoformer: 136 / 64, "tray-sealer": 88 / 64,
+  "flow-wrapper": 128 / 64, vffs: 76 / 64, robot: 76 / 64,
+  "case-packer": 96 / 64, palletizer: 84 / 64,
+};
+const GLYPH_FEET = 60 / 64; // baseline sits at 60/64 of glyph height
 const F = {
   display: "Archivo ExtraBold", head: "Archivo", headSemi: "Archivo SemiBold",
   body: "Inter", bodyMed: "Inter Medium", bodySemi: "Inter SemiBold",
@@ -32,7 +41,7 @@ const CW = PAGE_W - 2 * MX;
 const GUT = 0.25, COLW = (CW - 11 * GUT) / 12;
 const gx = (i) => MX + i * (COLW + GUT);
 const gw = (span) => span * COLW + (span - 1) * GUT;
-const LOCKUP_AR = 2400 / 293, MOTIF_AR = 2460 / 276;
+const LOCKUP_AR = 2400 / 293, MOTIF_AR = 2296 / 256;
 const R_CARD = 0.083, R_BTN = 0.042;
 const PART_AR = { rockwell: 848 / 221, rama: 315 / 92, cabinplant: 284 / 127, mondini: 448 / 113, sterimed: 160 / 65 };
 
@@ -81,13 +90,28 @@ function headline(s, text, y, mode, size, w) {
 }
 function slideHeader(s, eyebrowText, title, mode, titleW) {
   const dark = mode === "dark";
-  eyebrow(s, eyebrowText, MX, 0.56, dark ? C.n400 : C.n500);
+  // v0.4 6.A.10.4: dark-surface eyebrow text uses the derived warm token (PROPOSED). Light stays neutral.
+  eyebrow(s, eyebrowText, MX, 0.56, dark ? C.eyebrowDark : C.n500);
   headline(s, title, 0.9, mode, 24, titleW || 10.6);
 }
 function containImg(s, path, ar, x, y, w, h) {
   let dw = w, dh = w / ar;
   if (dh > h) { dh = h; dw = h * ar; }
   s.addImage({ path, x: x + (w - dw) / 2, y: y + (h - dh) / 2, w: dw, h: dh });
+}
+// Place an equipment glyph so its feet land on baseline `by`, horizontally centered in [x, x+colw].
+// `col` is "ink" (light surfaces) or "neutral" (dark surfaces). Returns the drawn box.
+function glyphOnBaseline(s, name, col, cx, by, h) {
+  const w = h * GLYPH_AR[name];
+  const top = by - h * GLYPH_FEET;
+  s.addImage({ path: A(`glyph-png/${name}-${col}.png`), x: cx - w / 2, y: top, w, h });
+  return { w, top };
+}
+// Small glyph as a header identifier next to a machine name (wayfinding, not decoration).
+function glyphTag(s, name, col, x, y, h) {
+  const w = h * GLYPH_AR[name];
+  s.addImage({ path: A(`glyph-png/${name}-${col}.png`), x, y, w, h });
+  return w;
 }
 function markSlot(s, partner, x, y, w, h) {
   s.addShape(pres.ShapeType.roundRect, { x, y, w, h, rectRadius: R_CARD, fill: { color: C.paper }, line: { color: C.n200, width: 0.5 } });
@@ -103,11 +127,11 @@ let s;
 // 01 — COVER, DARK (deck master)
 s = S(C.ink);
 s.addImage({ path: A("logos/lockup-horizontal-reversed.png"), x: MX, y: 0.62, w: 2.1, h: 2.1 / LOCKUP_AR });
-eyebrow(s, "Line assessment · Q3 2026", MX, 2.28, C.n400);
+eyebrow(s, "Line assessment · Q3 2026", MX, 2.28, C.eyebrowDark);
 txt(s, "We build your line,\nproduct to pallet.", { x: MX, y: 2.62, w: 10.8, h: 2.15, fontFace: F.display, fontSize: 43, color: C.paper, lineSpacingMultiple: 1.02 });
 redRule(s, MX, 4.78);
 txt(s, "One contract. One number to call. This review covers throughput, changeover,\nand the uptime we own after the line ships.", { x: MX, y: 5.0, w: 9.2, h: 0.75, fontFace: F.body, fontSize: 13, color: C.n300, lineSpacingMultiple: 1.35 });
-s.addImage({ path: A("motif/line-motif-dark.png"), x: PAGE_W - MX - 6.4, y: 6.0, w: 6.4, h: 6.4 / MOTIF_AR, transparency: 30 });
+s.addImage({ path: A("motif/glyph-motif-dark.png"), x: PAGE_W - MX - 6.4, y: 6.0, w: 6.4, h: 6.4 / MOTIF_AR, transparency: 30 });
 txt(s, "PREPARED FOR [CUSTOMER] · JULY 2026", { x: MX, y: 6.98, w: 6, h: 0.22, fontFace: F.mono, fontSize: 8.5, color: C.n500, charSpacing: 1.5 });
 txt(s, "HARPAK-ULMA · TAUNTON, MA", { x: PAGE_W - MX - 4, y: 6.98, w: 4, h: 0.22, align: "right", fontFace: F.mono, fontSize: 8.5, color: C.n500, charSpacing: 1.5 });
 notes(s, "COVER, DARK (default deck master per Brand Book Section 10).\nUse for: customer pitches, internal reviews, any dim room.\nReplace: eyebrow (deck type + date), title (one claim, sentence case, 12 words max), support line, PREPARED FOR.\nRules: title is a claim, not a topic label. One red rule is the only red element. Never place the lockup on red. Keep 1 S clear space around the lockup (S = symbol square height).");
@@ -116,7 +140,7 @@ notes(s, "COVER, DARK (default deck master per Brand Book Section 10).\nUse for:
 s = S(C.ink);
 s.addImage({ path: A("logos/lockup-horizontal-reversed.png"), x: MX, y: 0.62, w: 2.1, h: 2.1 / LOCKUP_AR });
 s.addImage({ path: A("logos/aura-ring.png"), x: PAGE_W - MX - 0.85, y: 0.55, w: 0.85, h: 0.85 });
-eyebrow(s, "Automation Fair 2026 · Session T-412", MX, 2.28, C.red400);
+eyebrow(s, "Automation Fair 2026 · Session T-412", MX, 2.28, C.eyebrowDark);
 txt(s, "The fault flagged before\nthe line stops.", { x: MX, y: 2.62, w: 10.8, h: 2.15, fontFace: F.display, fontSize: 43, color: C.paper, lineSpacingMultiple: 1.02 });
 txt(s, "Aura Edge by Harpak-ULMA runs the same intelligence on hardware at the line.\nThis session shows a measured fault catch on a running tray-seal line.", { x: MX, y: 4.85, w: 9.4, h: 0.75, fontFace: F.body, fontSize: 13, color: C.n300, lineSpacingMultiple: 1.35 });
 card(s, MX, 5.9, 3.9, 1.0, "light");
@@ -132,7 +156,7 @@ eyebrow(s, "Packaging Parables webinar · July 2026", MX, 2.28, C.n500);
 txt(s, "Flexible seafood lines:\nvariety without the changeover tax.", { x: MX, y: 2.62, w: 11.6, h: 2.15, fontFace: F.display, fontSize: 40, color: C.ink, lineSpacingMultiple: 1.04 });
 redRule(s, MX, 4.75);
 txt(s, "A systems view of multi-SKU seafood packaging: one integrated line,\nrecipe-driven changeover, and the numbers to hold it accountable.", { x: MX, y: 4.98, w: 9.4, h: 0.75, fontFace: F.body, fontSize: 13, color: C.n600, lineSpacingMultiple: 1.35 });
-s.addImage({ path: A("motif/line-motif-light.png"), x: PAGE_W - MX - 6.4, y: 6.0, w: 6.4, h: 6.4 / MOTIF_AR });
+s.addImage({ path: A("motif/glyph-motif-light.png"), x: PAGE_W - MX - 6.4, y: 6.0, w: 6.4, h: 6.4 / MOTIF_AR });
 txt(s, "MIKE MARCHAND · SENIOR PRODUCT MANAGER", { x: MX, y: 6.98, w: 6, h: 0.22, fontFace: F.mono, fontSize: 8.5, color: C.n500, charSpacing: 1.5 });
 notes(s, "COVER, LIGHT (bright rooms, webinars, the show floor; Section 10). Same anatomy as the dark cover: eyebrow, claim title, one red rule, support line, motif strip.");
 
@@ -141,15 +165,15 @@ s = S(C.paper);
 slideHeader(s, "For deck builders · Delete before presenting", "What's in this template", "light");
 const idx = [
   ["01 to 04", "Covers and setup", "Dark, co-branded, light, this index"],
-  ["05 to 09", "Structure", "Agendas and section dividers"],
-  ["10 to 14", "Narrative", "Statements, big number, quotes, full-bleed"],
-  ["15 to 21", "Evidence and data", "Stat bands, charts, tables, sourced quotes"],
-  ["22 to 33", "Solutions and scope", "Cards, machines, process, roadmap, industries"],
-  ["34 to 37", "People", "Bios, team grid, speakers"],
-  ["38 to 41", "Partners", "Ecosystem walls, built-with, partner detail"],
-  ["42 to 44", "Aura", "Sub-brand, event slide, demo frame"],
-  ["45 to 51", "Commercial and closing", "Case study, options, FAQ, asks, contact"],
-  ["52 to 54", "Governance", "Appendix and legal, cheat sheet, back cover"],
+  ["05 to 10", "Structure", "Agendas, section and product-line dividers"],
+  ["11 to 15", "Narrative", "Statements, big number, quotes, full-bleed"],
+  ["16 to 22", "Evidence and data", "Stat bands, charts, tables, sourced quotes"],
+  ["23 to 34", "Solutions and scope", "Cards, machines, glyph motif, roadmap, industries"],
+  ["35 to 38", "People", "Bios, team grid, speakers"],
+  ["39 to 42", "Partners", "Ecosystem walls, built-with, partner detail"],
+  ["43 to 45", "Aura", "Sub-brand, event slide, demo frame"],
+  ["46 to 52", "Commercial and closing", "Case study, options, FAQ, asks, contact"],
+  ["53 to 55", "Governance", "Appendix and legal, cheat sheet, back cover"],
 ];
 idx.forEach((row, i) => {
   const col = i % 2, r = Math.floor(i / 2);
@@ -159,9 +183,9 @@ idx.forEach((row, i) => {
   txt(s, row[2], { x: x + 1.5, y: y + 0.32, w: w - 1.5, h: 0.28, fontFace: F.body, fontSize: 10, color: C.n600 });
   if (r < 4) hair(s, x, y + 0.72, w, C.n200);
 });
-txt(s, "PICK ARCHETYPES, DUPLICATE, REFILL. USAGE RULES LIVE IN EACH SLIDE'S SPEAKER NOTES. DELETE SLIDES 04 AND 53 BEFORE PRESENTING.", { x: MX, y: 6.74, w: CW, h: 0.25, fontFace: F.mono, fontSize: 7.5, color: C.n500, charSpacing: 1 });
+txt(s, "PICK ARCHETYPES, DUPLICATE, REFILL. USAGE RULES LIVE IN EACH SLIDE'S SPEAKER NOTES. DELETE SLIDES 04 AND 54 BEFORE PRESENTING.", { x: MX, y: 6.74, w: CW, h: 0.25, fontFace: F.mono, fontSize: 7.5, color: C.n500, charSpacing: 1 });
 footer(s, "light", "TEMPLATE");
-notes(s, "TEMPLATE INDEX. Builder navigation only; delete before presenting (along with the cheat sheet, slide 53).");
+notes(s, "TEMPLATE INDEX. Builder navigation only; delete before presenting (along with the cheat sheet, slide 54).");
 
 // =====================================================================
 // SECTION 2 · STRUCTURE (05 to 09)
@@ -200,7 +224,7 @@ function divider(mode, num, title, sub, withMotif) {
   redRule(s, MX, 3.62);
   txt(s, title, { x: MX, y: 3.85, w: 10.5, h: 0.9, fontFace: F.head, bold: true, fontSize: 32, color: dark ? C.paper : C.ink });
   txt(s, sub, { x: MX, y: 4.62, w: 9, h: 0.4, fontFace: F.body, fontSize: 13, color: dark ? C.n300 : C.n600 });
-  if (withMotif) s.addImage({ path: A(dark ? "motif/line-motif-dark.png" : "motif/line-motif-light.png"), x: PAGE_W - MX - 6.4, y: 6.05, w: 6.4, h: 6.4 / MOTIF_AR, transparency: dark ? 45 : 0 });
+  if (withMotif) s.addImage({ path: A(dark ? "motif/glyph-motif-dark.png" : "motif/glyph-motif-light.png"), x: PAGE_W - MX - 6.4, y: 6.05, w: 6.4, h: 6.4 / MOTIF_AR, transparency: dark ? 45 : 0 });
   txt(s, `SECTION ${num} OF 06`, { x: MX, y: 6.98, w: 5, h: 0.22, fontFace: F.mono, fontSize: 8.5, color: C.n500, charSpacing: 1.5 });
   notes(s, `SECTION DIVIDER, ${mode.toUpperCase()}${withMotif ? " WITH MOTIF" : ""}. Number in mono, muted; title is a claim about the section where possible. Use every 5 to 8 slides in decks over 15 slides.`);
 }
@@ -208,13 +232,28 @@ divider("dark", "02", "Where throughput is lost", "Three failure modes we measur
 divider("light", "03", "The integrated approach", "One control layer, one recipe, every machine in step.", false); // 08
 divider("dark", "04", "What the numbers say", "Throughput, changeover, and scrap, measured on the line.", true);  // 09
 
+// 10 — PRODUCT-LINE DIVIDER, DARK (6.A.10.6: glyph + label + sub line, label always present)
+function productLineDivider(mode, glyph, label, subline) {
+  s = S(mode === "dark" ? C.ink : C.paper);
+  const dark = mode === "dark";
+  eyebrow(s, "Product line", MX, 2.55, dark ? C.eyebrowDark : C.n500);
+  redRule(s, MX, 2.9);
+  txt(s, label, { x: MX, y: 3.15, w: 7.2, h: 0.9, fontFace: F.head, bold: true, fontSize: 40, color: dark ? C.paper : C.ink });
+  txt(s, subline, { x: MX, y: 4.15, w: 7, h: 0.4, fontFace: F.body, fontSize: 14, color: dark ? C.n300 : C.n600 });
+  const gH = 2.3, baseline = 5.0, cx = PAGE_W - MX - (gH * GLYPH_AR[glyph]) / 2 - 0.4;
+  glyphOnBaseline(s, glyph, dark ? "neutral" : "ink", cx, baseline, gH);
+  txt(s, "PRODUCT LINES: TRAY SEALING · THERMOFORMING · FLOW WRAPPING · VERTICAL FFS · AUTOMATION · WEIGHING AND INFEED", { x: MX, y: 6.98, w: CW, h: 0.22, fontFace: F.mono, fontSize: 8, color: C.n500, charSpacing: 1.2 });
+  notes(s, "PRODUCT-LINE DIVIDER (v0.4 6.A.10.6). One equipment glyph paired with its Archivo label and sub line. The label is always present; the glyph never stands alone. Swap the glyph and label per the six product lines: Tray Sealing (glyph-tray-sealer, G. Mondini platform), Thermoforming (glyph-thermoformer, TFS / TFX series), Flow Wrapping (glyph-flow-wrapper, FM series), Vertical FFS (glyph-vffs, Bagging systems), Automation (glyph-robot, Robotics and line control), Weighing and Infeed (glyph-weigher, CabinPlant systems). Glyph is neutral on dark, ink on light; minimum 40 px display height.");
+}
+productLineDivider("dark", "tray-sealer", "Tray sealing", "G. Mondini platform");
+
 // =====================================================================
 // SECTION 3 · NARRATIVE (10 to 14)
 // =====================================================================
 
 // 10 — STATEMENT, DARK
 s = S(C.ink);
-s.addImage({ path: A("motif/line-motif-dark.png"), x: PAGE_W - 7.2, y: 6.05, w: 7.2, h: 7.2 / MOTIF_AR, transparency: 55 });
+s.addImage({ path: A("motif/glyph-motif-dark.png"), x: PAGE_W - 7.2, y: 6.05, w: 7.2, h: 7.2 / MOTIF_AR, transparency: 55 });
 redRule(s, MX, 2.35);
 txt(s, "We own the whole line.", { x: MX, y: 2.6, w: 11.8, h: 1.3, fontFace: F.display, fontSize: 48, color: C.paper });
 txt(s, "Rockwell controls and Mondini sealing run on the line. We integrate them\nand stand behind the combined result.", { x: MX, y: 4.0, w: 9.6, h: 0.8, fontFace: F.body, fontSize: 14, color: C.n300, lineSpacingMultiple: 1.4 });
@@ -222,7 +261,7 @@ notes(s, "STATEMENT, DARK. One claim, 8 words or fewer if possible. Use before o
 
 // 11 — BIG NUMBER, DARK
 s = S(C.ink);
-eyebrow(s, "The cost of manual changeover", MX, 1.5, C.n400);
+eyebrow(s, "The cost of manual changeover", MX, 1.5, C.eyebrowDark);
 txt(s, "47 min", { x: MX, y: 1.85, w: 11, h: 2.0, fontFace: F.monoMed, fontSize: 110, color: C.paper });
 redRule(s, MX, 4.15);
 txt(s, "Average changeover on the current line, timed across 12 SKU changes.", { x: MX, y: 4.4, w: 10.5, h: 0.5, fontFace: F.head, bold: true, fontSize: 20, color: C.paper });
@@ -466,7 +505,8 @@ slideHeader(s, "Solutions / Tray sealing", "One tray-seal line, held to its numb
 const specX = MX, specY = 2.1, specW = gw(5);
 card(s, specX, specY, specW, 4.15, "dark");
 txt(s, "G. MONDINI · PLATFORM", { x: specX + 0.3, y: specY + 0.28, w: specW - 0.6, h: 0.2, fontFace: F.monoMed, fontSize: 8, color: C.n500, charSpacing: 1.8 });
-txt(s, "Trave tray sealer", { x: specX + 0.3, y: specY + 0.52, w: specW - 0.6, h: 0.35, fontFace: F.bodySemi, fontSize: 15, color: C.paper });
+txt(s, "Trave tray sealer", { x: specX + 0.3, y: specY + 0.52, w: specW - 2.0, h: 0.35, fontFace: F.bodySemi, fontSize: 15, color: C.paper });
+glyphTag(s, "tray-sealer", "neutral", specX + specW - 0.9, specY + 0.26, 0.44); // header id, wayfinding not decoration
 const spec = [
   ["Throughput", "up to 120 ppm"],
   ["Tooling changeover", "< 20 min"],
@@ -490,16 +530,18 @@ notes(s, "MACHINE + SPEC, DARK. Specs lead. All figures in Mono with units; part
 s = S(C.ink);
 slideHeader(s, "The hardware on this line", "Three machines, one control layer", "dark");
 const lineup = [
-  ["photos/photo-machine-bagger.jpg", 1439 / 1388, "ULMA VB 44", "Vertical bagger, multihead weigher infeed", ["120 bpm", "11 SKUs"]],
-  ["photos/photo-machine-bagger-2.jpg", 764 / 977, "ULMA TFX 500", "Thermoformer, recyclable film ready", ["120 mm draw", "<20 min"]],
-  ["photos/photo-line-hmi-ui.jpg", 995 / 679, "Line control", "Allen-Bradley recipe layer, one HMI", ["1 recipe", "5 machines"]],
+  ["photos/photo-machine-bagger.jpg", 1439 / 1388, "ULMA VB 44", "Vertical bagger, multihead weigher infeed", ["120 bpm", "11 SKUs"], "vffs"],
+  ["photos/photo-machine-bagger-2.jpg", 764 / 977, "ULMA TFX 500", "Thermoformer, recyclable film ready", ["120 mm draw", "<20 min"], "thermoformer"],
+  ["photos/photo-line-hmi-ui.jpg", 995 / 679, "Line control", "Allen-Bradley recipe layer, one HMI", ["1 recipe", "5 machines"], null],
 ];
 lineup.forEach((m, i) => {
   const x = gx(i * 4), w = gw(4) - 0.18, y = 2.05, h = 4.35;
   card(s, x, y, w, h, "dark");
   s.addShape(pres.ShapeType.roundRect, { x: x + 0.22, y: y + 0.22, w: w - 0.44, h: 1.95, rectRadius: R_CARD, fill: { color: C.paper } });
   containImg(s, A(m[0]), m[1], x + 0.32, y + 0.3, w - 0.64, 1.79);
-  txt(s, m[2], { x: x + 0.28, y: y + 2.35, w: w - 0.56, h: 0.32, fontFace: F.bodySemi, fontSize: 13.5, color: C.paper });
+  const nameX = m[5] ? x + 0.28 + 0.44 * GLYPH_AR[m[5]] + 0.18 : x + 0.28;
+  if (m[5]) glyphTag(s, m[5], "neutral", x + 0.28, y + 2.34, 0.44); // optional header id
+  txt(s, m[2], { x: nameX, y: y + 2.35, w: x + w - 0.28 - nameX, h: 0.32, fontFace: F.bodySemi, fontSize: 13.5, color: C.paper });
   txt(s, m[3], { x: x + 0.28, y: y + 2.75, w: w - 0.56, h: 0.55, fontFace: F.body, fontSize: 10.5, color: C.n300, lineSpacingMultiple: 1.3 });
   m[4].forEach((chip, j) => {
     const cx = x + 0.28 + j * 1.55;
@@ -511,26 +553,35 @@ txt(s, "MACHINE NAMES AND FIGURES ILLUSTRATIVE · REPLACE WITH THE QUOTED LINE [
 footer(s, "dark", "LINE ASSESSMENT");
 notes(s, "MACHINE LINEUP, DARK. Three machine cards: photo on a white inset panel (equipment photography stays on neutral), name, role, two Mono spec chips. Use for the proposed line's bill of machines.");
 
-// 27 — PROCESS MOTIF, LIGHT
+// 27 — PROCESS MOTIF, LIGHT (recomposed on equipment glyphs, 6.A.10.5)
 s = S(C.paper);
 slideHeader(s, "The product-to-pallet line", "Product to pallet, one accountable line", "light");
-s.addImage({ path: A("motif/line-motif-light.png"), x: MX, y: 2.6, w: CW, h: CW / MOTIF_AR });
-const stages = [
-  ["INFEED", "Weighing / loading"],
-  ["FORM", "TFX thermoform"],
-  ["SEAL", "Mondini Trave"],
-  ["LOAD", "ULMA robot"],
-  ["PACK", "Case packing"],
-  ["PALLET", "Palletizing"],
-];
-stages.forEach((st, i) => {
-  const x = MX + (CW / 6) * i;
-  txt(s, st[0], { x, y: 4.35, w: CW / 6 - 0.15, h: 0.22, fontFace: F.monoMed, fontSize: 8.5, color: C.red600, charSpacing: 1.6 });
-  txt(s, st[1], { x, y: 4.6, w: CW / 6 - 0.15, h: 0.28, fontFace: F.body, fontSize: 10, color: C.n600 });
-});
-txt(s, "Until commissioned photography is approved, this branded line motif stands in, with the real machine names on the line.", { x: MX, y: 5.55, w: 10.5, h: 0.5, fontFace: F.body, fontSize: 10.5, color: C.n500 });
+{
+  const stations = [
+    ["weigher", "INFEED", "CabinPlant weigher"],
+    ["thermoformer", "FORM", "TFS thermoformer"],
+    ["tray-sealer", "SEAL", "Mondini Trave"],
+    ["robot", "LOAD", "ULMA robot"],
+    ["case-packer", "PACK", "Case packer"],
+    ["palletizer", "PALLET", "Palletizer"],
+  ];
+  const nCol = 7, colw = CW / nCol, baseline = 4.15, gH = 0.72;
+  s.addShape(pres.ShapeType.line, { x: MX, y: baseline, w: CW, h: 0, line: { color: C.n300, width: 1.5 } });
+  stations.forEach((st, i) => {
+    const cx = MX + (i + 0.5) * colw;
+    glyphOnBaseline(s, st[0], "ink", cx, baseline, gH);
+    txt(s, st[1], { x: cx - colw / 2, y: baseline + 0.16, w: colw, h: 0.2, align: "center", fontFace: F.monoMed, fontSize: 8, color: C.n600, charSpacing: 1.6 });
+    txt(s, st[2], { x: cx - colw / 2, y: baseline + 0.4, w: colw, h: 0.5, align: "center", fontFace: F.body, fontSize: 9.5, color: C.ink, lineSpacingMultiple: 1.2 });
+  });
+  // Aura ring floated slightly above the baseline at the end
+  const rcx = MX + 6.5 * colw, rH = 0.6;
+  s.addImage({ path: A("logos/aura-ring.png"), x: rcx - rH / 2, y: baseline - 0.16 - rH, w: rH, h: rH });
+  txt(s, "AURA", { x: rcx - colw / 2, y: baseline + 0.16, w: colw, h: 0.2, align: "center", fontFace: F.monoMed, fontSize: 8, color: C.n600, charSpacing: 1.6 });
+  txt(s, "Line intelligence", { x: rcx - colw / 2, y: baseline + 0.4, w: colw, h: 0.5, align: "center", fontFace: F.body, fontSize: 9.5, color: C.ink });
+}
+txt(s, "Stations swap to match the quoted line. A vertical line runs weigher, VFFS, case packer. Never show a station the quote does not include.", { x: MX, y: 5.55, w: 10.8, h: 0.5, fontFace: F.body, fontSize: 10.5, color: C.n500 });
 footer(s, "light", "WEBINAR");
-notes(s, "LINE MOTIF, LIGHT. The scope diagram. Every stage named with its real machine. Red stage tags are the one red accent.");
+notes(s, "PROCESS MOTIF, LIGHT (v0.4 6.A.10.5). Stations are equipment glyphs on a shared 2 px baseline, feet touching, real machine names below an eyebrow cap. The Aura ring floats slightly above the baseline at the end, labeled AURA / Line intelligence. Default order: weigher, thermoformer, tray sealer, robot, case packer, palletizer, ring. Swap stations to match the quoted line; never show a station the quote does not include (vertical example: weigher, VFFS, case packer). Glyphs are ink on light; at most one red accent dot per slide on the mechanism of the station discussed, default zero.");
 
 // 28 — TIMELINE, LIGHT
 s = S(C.paper);
@@ -874,7 +925,7 @@ notes(s, "AURA SUB-BRAND (Section 8, Option B). Deep Navy surface; the ring is t
 s = S(C.ink);
 s.addImage({ path: A("logos/lockup-horizontal-reversed.png"), x: MX, y: 0.62, w: 1.9, h: 1.9 / LOCKUP_AR });
 s.addImage({ path: A("logos/aura-ring.png"), x: PAGE_W - MX - 1.5, y: 0.62, w: 1.5, h: 1.5 });
-eyebrow(s, "Automation Fair 2026", MX, 2.5, C.red400);
+eyebrow(s, "Automation Fair 2026", MX, 2.5, C.eyebrowDark);
 txt(s, "One line. One number to call.", { x: MX, y: 2.85, w: 11.6, h: 1.2, fontFace: F.display, fontSize: 44, color: C.paper });
 txt(s, [
   { text: "AURA ", options: { color: "FFFFFF" } },
@@ -1002,14 +1053,14 @@ notes(s, "SUMMARY, LIGHT. Three takeaways, each a claim with support. The red ar
 
 // 49 — CLOSING CTA, DARK
 s = S(C.ink);
-eyebrow(s, "The ask", MX, 1.5, C.n400);
+eyebrow(s, "The ask", MX, 1.5, C.eyebrowDark);
 txt(s, "One line. One number to call.", { x: MX, y: 1.85, w: 11.5, h: 1.1, fontFace: F.display, fontSize: 40, color: C.paper });
 txt(s, "Approve the two-week line assessment and we will spec the line that hits your rate,\nwith the changeover and uptime commitments in writing.", { x: MX, y: 3.05, w: 10, h: 0.8, fontFace: F.body, fontSize: 13.5, color: C.n300, lineSpacingMultiple: 1.4 });
 s.addShape(pres.ShapeType.roundRect, { x: MX, y: 4.25, w: 3.15, h: 0.58, rectRadius: R_BTN, fill: { color: C.red } });
 txt(s, "Request a line assessment", { x: MX, y: 4.25, w: 3.15, h: 0.58, align: "center", valign: "middle", fontFace: F.bodySemi, fontSize: 12.5, color: "FFFFFF" });
 txt(s, "PACKAGING@HARPAK-ULMA.COM   ·   +1 508 555 0142 [PLACEHOLDER]   ·   HARPAK-ULMA.COM", { x: MX, y: 5.15, w: 10, h: 0.25, fontFace: F.mono, fontSize: 9, color: C.n500, charSpacing: 1.2 });
 s.addImage({ path: A("logos/lockup-horizontal-reversed.png"), x: MX, y: 6.55, w: 1.9, h: 1.9 / LOCKUP_AR });
-s.addImage({ path: A("motif/line-motif-dark.png"), x: PAGE_W - MX - 5.6, y: 6.45, w: 5.6, h: 5.6 / MOTIF_AR, transparency: 45 });
+s.addImage({ path: A("motif/glyph-motif-dark.png"), x: PAGE_W - MX - 5.6, y: 6.45, w: 5.6, h: 5.6 / MOTIF_AR, transparency: 45 });
 notes(s, "CLOSING, DARK. The final slide is the ask with a date, never 'Thank you'. One red button, 4 px radius.");
 
 // 50 — CLOSING CTA, LIGHT
@@ -1021,7 +1072,7 @@ s.addShape(pres.ShapeType.roundRect, { x: MX, y: 4.25, w: 3.15, h: 0.58, rectRad
 txt(s, "Request a line assessment", { x: MX, y: 4.25, w: 3.15, h: 0.58, align: "center", valign: "middle", fontFace: F.bodySemi, fontSize: 12.5, color: "FFFFFF" });
 txt(s, "PACKAGING@HARPAK-ULMA.COM   ·   +1 508 555 0142 [PLACEHOLDER]   ·   HARPAK-ULMA.COM", { x: MX, y: 5.15, w: 10, h: 0.25, fontFace: F.mono, fontSize: 9, color: C.n500, charSpacing: 1.2 });
 s.addImage({ path: A("logos/lockup-horizontal-color.png"), x: MX, y: 6.55, w: 1.9, h: 1.9 / LOCKUP_AR });
-s.addImage({ path: A("motif/line-motif-light.png"), x: PAGE_W - MX - 5.6, y: 6.45, w: 5.6, h: 5.6 / MOTIF_AR });
+s.addImage({ path: A("motif/glyph-motif-light.png"), x: PAGE_W - MX - 5.6, y: 6.45, w: 5.6, h: 5.6 / MOTIF_AR });
 notes(s, "CLOSING, LIGHT. Identical anatomy to the dark closer. White on red-500 passes AA at 4.91:1.");
 
 // 51 — CONTACT, LIGHT
@@ -1083,7 +1134,7 @@ const rules = [
   "Figures, units, and part numbers in Mono. Ranges use 'to', never a dash.",
   "No banned words: seamless, unlock, AI-powered, world-class, cutting-edge, end-to-end.",
   "Grid: 0.67 in margins, 12 columns, 0.25 in gutters. Radius: 4 px buttons, 8 px cards.",
-  "Every figure is verified or tagged [GET]. Delete slides 04 and 53 before presenting.",
+  "Every figure is verified or tagged [GET]. Delete slides 04 and 54 before presenting.",
 ];
 rules.forEach((r, i) => {
   const col = i % 2, rr = Math.floor(i / 2);
@@ -1098,7 +1149,7 @@ s.addImage({ path: A("logos/lockup-horizontal-reversed.png"), x: MX, y: 2.9, w: 
 redRule(s, MX, 3.75);
 txt(s, "Product to pallet.", { x: MX, y: 3.98, w: 8, h: 0.6, fontFace: F.head, bold: true, fontSize: 22, color: C.paper });
 txt(s, "HARPAK-ULMA.COM · TAUNTON, MASSACHUSETTS", { x: MX, y: 6.98, w: 8, h: 0.22, fontFace: F.mono, fontSize: 8.5, color: C.n500, charSpacing: 1.5 });
-s.addImage({ path: A("motif/line-motif-dark.png"), x: PAGE_W - MX - 6.4, y: 6.0, w: 6.4, h: 6.4 / MOTIF_AR, transparency: 40 });
+s.addImage({ path: A("motif/glyph-motif-dark.png"), x: PAGE_W - MX - 6.4, y: 6.0, w: 6.4, h: 6.4 / MOTIF_AR, transparency: 40 });
 notes(s, "BACK COVER, DARK. The span phrase anchors the close. Nothing else competes.");
 
 pres.writeFile({ fileName: "Harpak-ULMA-Deck-Template.pptx" }).then(() => console.log("written", PAGE, "slides"));

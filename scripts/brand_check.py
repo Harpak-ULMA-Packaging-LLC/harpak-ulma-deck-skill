@@ -5,9 +5,12 @@ Usage: python brand_check.py deck.pptx
 
 Scans every slide (and speaker notes) for the failures that most often ship:
 banned words, em-dashes, dash ranges, off-brand fonts, sub-floor type sizes,
-and leftover template placeholders. Reports remaining [GET] tags as a gap
-list rather than a failure. Exit code 1 if any FAIL is found.
+and leftover template placeholders. Also enforces the v0.4 glyph rules: no
+retired abstract-wireframe motif assets embedded, and no baked hex color
+inside any equipment glyph SVG placed in a deck. Reports remaining [GET] tags
+as a gap list rather than a failure. Exit code 1 if any FAIL is found.
 """
+import hashlib
 import re
 import sys
 import zipfile
@@ -15,6 +18,17 @@ from collections import defaultdict
 from xml.etree import ElementTree as ET
 
 NS = {"a": "http://schemas.openxmlformats.org/drawingml/2006/main"}
+
+# v0.4 6.A.10.5: the abstract wireframe line motif is retired. These are the
+# sha256 of the retired raster masters; any embedded copy fails the deck.
+RETIRED_MOTIF_SHA256 = {
+    "756c7812e9ee2d63a3494cd750801c56d11a7452d3653661e0bdc8e503937d09": "line-motif-dark.png (retired wireframe motif)",
+    "024fcfd8169c445fcb17565979978021f22b644c3a2102ce9af1e6d631a565d2": "line-motif-light.png (retired wireframe motif)",
+}
+# A glyph SVG is a currentColor stroke silhouette on a height-64 canvas.
+GLYPH_SVG = re.compile(rb'stroke="currentColor"')
+GLYPH_VIEWBOX = re.compile(rb'viewBox="0 0 \d+ 64"')
+HEX_COLOR = re.compile(rb'#[0-9A-Fa-f]{3,6}\b')
 
 BANNED = [
     "seamless", "unlock", "ai-powered", "synergy", "leverage",
@@ -84,6 +98,23 @@ def main(path):
                 fails.append(f"slide {num}: off-brand font '{font}' on '{(text or '')[:30]}'")
             if size and size < 7.5 and (text or "").strip():
                 fails.append(f"slide {num}: type below 7.5 pt ({size} pt) on '{(text or '')[:30]}'")
+    # v0.4 glyph guardrails, checked against the deck's embedded media.
+    for part in z.namelist():
+        if not part.startswith("ppt/media/"):
+            continue
+        data = z.read(part)
+        digest = hashlib.sha256(data).hexdigest()
+        if digest in RETIRED_MOTIF_SHA256:
+            fails.append(f"media {part}: retired abstract motif embedded ({RETIRED_MOTIF_SHA256[digest]}); rebuild the motif from equipment glyphs")
+        if part.lower().endswith(".svg") and (GLYPH_SVG.search(data) and GLYPH_VIEWBOX.search(data)):
+            if HEX_COLOR.search(data):
+                fails.append(f"media {part}: equipment glyph SVG has a baked hex color; glyphs must inherit currentColor")
+    # Also flag any external relationship still pointing at a retired motif file by name.
+    for rels in (n for n in z.namelist() if n.endswith(".rels")):
+        txt = z.read(rels).decode("utf8", "ignore")
+        if "line-motif" in txt:
+            fails.append(f"{rels}: references a retired 'line-motif' asset; use glyph-motif assets")
+
     print(f"Checked {len(slides)} slides in {path}\n")
     for f in fails:
         print("FAIL ", f)

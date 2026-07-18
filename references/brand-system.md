@@ -33,6 +33,8 @@ book's rules.
 | green success text | 11532D | DO icon and text |
 | green tint (derived) | E9F2EC | DO panel tint |
 | navy (Aura) | 0C1B33 | Aura slide background only |
+| glyph neutral | 9BA1A7 | Equipment glyphs on dark (8.0:1 on ink); v0.4 CONFIRMED |
+| eyebrow dark | FF5A46 | Dark-surface eyebrow text (6.8:1 on ink); v0.4 PROPOSED, awaiting ratification |
 | navy surface (derived) | 13253F | Aura product panel fill |
 | navy border (derived) | 24374F | Aura hairlines |
 | teal (Aura) | 00E3CC | Aura eyebrows/accents on navy only |
@@ -133,12 +135,66 @@ lockup 2.1 in wide; closing 1.9; footer 1.25. Never on brand red, never
 recolored, never with effects, nothing inside 1 S clear space (S = symbol
 square height, about 0.26 in at cover size).
 
-## Line motif and scrims (assets/motif)
+## Equipment silhouette glyphs (assets/glyphs, assets/glyph-png) — v0.4 6.A.10
 
-- line-motif-dark.png / line-motif-light.png (aspect 8.91:1): the
-  product-to-pallet line illustration. Bottom strip on covers/closers
-  (6.4 in wide, transparency 30 to 55 on dark), or full-width diagram on
-  the process slide with Mono stage labels.
+The line motif is now built from equipment silhouette glyphs: stroke
+silhouettes of the real Harpak-ULMA machine classes, ratified canon in
+Brand Book v0.4 (6.A.10, CONFIRMED). This is a second iconography tier
+above the 24 px icons, drawn for motif and display scale.
+
+The eight masters (assets/glyphs/glyph-*.svg, currentColor, height-64
+canvas, feet on a shared y=60 baseline, no baked hex): weigher (64 wide),
+thermoformer (136), tray-sealer (88), flow-wrapper (128), vffs (76),
+robot (76), case-packer (96), palletizer (84). Pre-rendered PNGs in
+assets/glyph-png as `<glyph>-ink.png` (light surfaces) and
+`<glyph>-neutral.png` (dark surfaces).
+
+Construction rules (6.A.10.2): 2 px stroke, butt caps, miter joins,
+monochrome currentColor, fill none. Silhouette plus mechanism marks only;
+if a detail does not identify the machine class at 64 px it is omitted.
+Never scale a glyph vertically to fill a tile, never add interior detail,
+never a fill or gradient, never per-station recoloring, never a baked hex.
+
+Color (6.A.10.4): glyphs inherit the surface text token. Dark: glyph
+neutral #9BA1A7 on ink (8.0:1). Light: ink #030303. Never pure white
+glyphs on dark. Minimum display height 40 px on slides; below that use a
+text label (the 24 px icon redraws do not exist yet).
+
+Motif composition (6.A.10.5): the product-to-pallet motif places glyphs on
+a shared 2 px baseline, feet touching, real machine names below an eyebrow
+cap, with the Aura ring floated slightly above the baseline at the end,
+labeled AURA / Line intelligence. Default order: weigher, thermoformer,
+tray-sealer, robot, case-packer, palletizer, ring. Stations swap to match
+the quoted line (vertical example: weigher, VFFS, case-packer); never show
+a station the quote does not include.
+
+Product line language (6.A.10.6): one glyph per product line, always with
+its label. Tray Sealing (glyph-tray-sealer, G. Mondini platform),
+Thermoforming (glyph-thermoformer, TFS / TFX series), Flow Wrapping
+(glyph-flow-wrapper, FM series), Vertical FFS (glyph-vffs, Bagging
+systems), Automation (glyph-robot, Robotics and line control), Weighing
+and Infeed (glyph-weigher, CabinPlant systems). The glyph never stands
+alone; the word is the claim.
+
+Red on the glyph motif: at most one red accent dot per slide, on the
+mechanism of the station the slide discusses, and it counts as the slide's
+one red element. Default is zero dots. The motif strips ship with zero
+dots.
+
+Governance: glyph-case-packer and glyph-palletizer are authored interim
+geometry (CONFIRMED, GET real references to true up). Silhouettes of
+partner-supplied machines are original class drawings, not partner marks;
+captions keep named partner credit (Mondini Trave, CabinPlant).
+
+## Recomposed motif strips and scrims (assets/motif)
+
+- glyph-motif-dark.png / glyph-motif-light.png (aspect 8.97:1): the
+  recomposed product-to-pallet strip built from the six glyphs plus the
+  Aura ring, feet on a shared baseline, zero red dots. Neutral on dark,
+  ink on light. Bottom strip on covers, closings, statement, and back
+  cover; the process slide draws glyphs at display scale in code instead.
+  The abstract wireframe motif (line-motif-*.png) is RETIRED at v0.4 and
+  removed; brand_check fails any deck that re-embeds it.
 - scrim-bottom.png, scrim-left.png: gradient scrims guaranteeing text
   contrast over photography. Keep text inside the scrim zone.
 

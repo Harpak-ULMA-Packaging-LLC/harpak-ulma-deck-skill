@@ -1,8 +1,8 @@
 # Harpak-ULMA deck skill
 
-The presentation system for Harpak-ULMA, built from Brand Book v0.3. One
+The presentation system for Harpak-ULMA, built from Brand Book v0.4. One
 repo holds everything a person or an AI agent needs to produce an on-brand
-deck: a 54-slide PowerPoint template, the brand rules distilled for slides,
+deck: a 55-slide PowerPoint template, the brand rules distilled for slides,
 a Claude skill that builds decks from them, and a QA gate that catches
 violations before they ship.
 
@@ -14,16 +14,26 @@ touch a decision.
 
 ## What's in the template
 
-54 archetype slides in ten sections, in a dark system (the deck master) and
+55 archetype slides in ten sections, in a dark system (the deck master) and
 a light system (bright rooms, webinars, the show floor). Covers, agendas,
-dividers, statements, big numbers, quotes, stat bands, before/after, bar
-and line charts, comparison tables, sourced evidence, card grids, machine
-and spec layouts, machine lineups, the product-to-pallet process motif,
-timelines, roadmaps, industries, certifications, presenter bios, team
-grids, partner ecosystem walls with marks, co-branding contexts, Aura and
-Aura Edge slides, demo frames, case studies, commercial options, FAQ,
-closers that end on the ask, and the legal appendix. Slide 04 indexes the
-set; every slide's speaker notes carry its usage rules.
+section and product-line dividers, statements, big numbers, quotes, stat
+bands, before/after, bar and line charts, comparison tables, sourced
+evidence, card grids, machine and spec layouts, machine lineups, the
+product-to-pallet process motif, timelines, roadmaps, industries,
+certifications, presenter bios, team grids, partner ecosystem walls with
+marks, co-branding contexts, Aura and Aura Edge slides, demo frames, case
+studies, commercial options, FAQ, closers that end on the ask, and the
+legal appendix. Slide 04 indexes the set; every slide's speaker notes carry
+its usage rules.
+
+The line motif is built from eight equipment silhouette glyphs (Brand Book
+v0.4, Section 6.A.10): the real machine classes on a shared baseline, with
+the Aura ring floated at the end. Glyphs carry the process motif, the
+product-line dividers, the closings, and the machine slides; they inherit
+the surface text color (neutral on dark, ink on light).
+
+![Process motif](docs/preview/process-motif-light.jpg)
+![Product-line divider](docs/preview/product-line-divider.jpg)
 
 ![All slides, first half](docs/preview/all-slides-1.jpg)
 ![All slides, second half](docs/preview/all-slides-2.jpg)
@@ -42,7 +52,7 @@ set; every slide's speaker notes carry its usage rules.
 3. Keep the slides you need, duplicate archetypes for more, refill the
    text. The speaker notes on every slide tell you what to change and what
    to leave alone.
-4. Delete slides 04 (index) and 53 (cheat sheet) before presenting, and
+4. Delete slides 04 (index) and 54 (cheat sheet) before presenting, and
    resolve every visible [GET] tag: those mark figures that need verified
    values.
 
@@ -82,9 +92,10 @@ python scripts/brand_check.py your-deck.pptx
 ```
 
 Scans every slide and speaker note for banned words, em-dashes, dash
-ranges, off-brand fonts, type below 7.5 pt, and leftover placeholders,
-and lists open [GET] items. Exit code 1 on any FAIL. Run it before
-anything ships.
+ranges, off-brand fonts, type below 7.5 pt, and leftover placeholders;
+fails any deck that re-embeds the retired wireframe motif (matched by
+content hash) or a glyph SVG with a baked hex color; and lists open [GET]
+items. Exit code 1 on any FAIL. Run it before anything ships.
 
 ## Repo layout
 
@@ -92,8 +103,9 @@ anything ships.
 SKILL.md               The Claude skill: workflow and rules
 references/            Brand system, archetype map, voice, partner/Aura rules
 scripts/               brand_check.py (QA), tokens.js, build_template.js
-assets/template/       The 54-slide .pptx template
+assets/template/       The 55-slide .pptx template
 assets/fonts/          Brand fonts + install kit + OFL license
+assets/glyphs|glyph-png/   Equipment silhouette glyphs (v0.4 6.A.10)
 assets/logos|motif|icons|photos|partners/
 evals/                 Test prompt and benchmark from skill development
 docs/preview/          Rendered previews used above
@@ -101,8 +113,10 @@ docs/preview/          Rendered previews used above
 
 ## Governance
 
-Brand Book v0.3 is a draft for marketing ratification; most decisions are
-PROPOSED and tagged. The lockups here are interim vectors rebuilt from the
+Brand Book v0.4 is a draft for marketing ratification; most decisions are
+PROPOSED and tagged. The equipment glyph system (6.A.10) is CONFIRMED
+canon; the dark-surface eyebrow color #FF5A46 is PROPOSED and carried on
+the open list. The lockups here are interim vectors rebuilt from the
 in-use site mark, standing in until the commissioned vector master ships.
 Partner marks are reference rasters: production use requires each
 partner's approved vector files and guidelines. Aura and Aura Edge naming

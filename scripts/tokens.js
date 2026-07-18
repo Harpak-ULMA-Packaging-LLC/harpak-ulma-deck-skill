@@ -13,7 +13,18 @@ const C = {
   navy: "0C1B33", navySurface: "13253F", navyBorder: "24374F",
   teal: "00E3CC", auraBlue: "0078FF",
   surfaceDark: "0E1012", cardDark: "141719", borderDark: "26282B",
+  glyphNeutral: "9BA1A7",  // v0.4 6.A.10.4: equipment glyphs on dark (8.0:1 on ink)
+  eyebrowDark: "FF5A46",   // v0.4 PROPOSED: dark-surface eyebrow text (6.8:1 on ink)
 };
+
+// Equipment glyph aspect ratios (width/height), height-64 canvas (v0.4 6.A.10.3).
+// Pre-rendered PNGs live in assets/glyph-png as <glyph>-ink.png / <glyph>-neutral.png.
+const GLYPH_AR = {
+  weigher: 64 / 64, thermoformer: 136 / 64, "tray-sealer": 88 / 64,
+  "flow-wrapper": 128 / 64, vffs: 76 / 64, robot: 76 / 64,
+  "case-packer": 96 / 64, palletizer: 84 / 64,
+};
+const GLYPH_FEET = 60 / 64; // baseline sits at 60/64 of glyph height
 
 const F = {
   display: "Archivo ExtraBold", head: "Archivo", headSemi: "Archivo SemiBold",
@@ -25,7 +36,7 @@ const L = {
   PAGE_W: 13.333, PAGE_H: 7.5, MX: 0.67,
   CW: 13.333 - 2 * 0.67, GUT: 0.25,
   COLW: (13.333 - 2 * 0.67 - 11 * 0.25) / 12,
-  LOCKUP_AR: 2400 / 293, STACK_AR: 1800 / 921, MOTIF_AR: 2460 / 276,
+  LOCKUP_AR: 2400 / 293, STACK_AR: 1800 / 921, MOTIF_AR: 2296 / 256, // glyph motif strip
   R_CARD: 0.083, R_BTN: 0.042,
   gx: (i) => 0.67 + i * ((13.333 - 2 * 0.67 - 11 * 0.25) / 12 + 0.25),
   gw: (span) => span * ((13.333 - 2 * 0.67 - 11 * 0.25) / 12) + (span - 1) * 0.25,
@@ -58,10 +69,10 @@ function helpers(pres, A) {
     },
     slideHeader: (s, eyebrowText, title, mode, titleW) => {
       const dark = mode === "dark";
-      txt(s, eyebrowText.toUpperCase(), { x: L.MX, y: 0.56, w: 8, h: 0.28, fontFace: F.monoMed, fontSize: 10, color: dark ? C.n400 : C.n500, charSpacing: 2 });
+      txt(s, eyebrowText.toUpperCase(), { x: L.MX, y: 0.56, w: 8, h: 0.28, fontFace: F.monoMed, fontSize: 10, color: dark ? C.eyebrowDark : C.n500, charSpacing: 2 }); // v0.4 dark eyebrow token
       txt(s, title, { x: L.MX, y: 0.9, w: titleW || 10.6, h: 1.0, fontFace: F.head, bold: true, fontSize: 24, color: dark ? C.paper : C.ink, lineSpacingMultiple: 1.08 });
     },
   };
 }
 
-module.exports = { C, F, L, helpers };
+module.exports = { C, F, L, GLYPH_AR, GLYPH_FEET, helpers };

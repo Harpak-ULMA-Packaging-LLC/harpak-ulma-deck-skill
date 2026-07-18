@@ -14,10 +14,10 @@ advice conflict, this skill wins.
 
 A .pptx built from `assets/template/Harpak-ULMA-Deck-Template.pptx` (16:9,
 13.333 x 7.5 in), in the dark system (default) or light system (bright rooms,
-webinars, show floor), that passes the QA gate below. The template contains 54
+webinars, show floor), that passes the QA gate below. The template contains 55
 archetype slides in ten sections (slide 04 is the index) with usage guidance
 in the speaker notes; your job is to select, duplicate, and refill them, not
-to invent new visual language. Slides 04 and 53 are builder aids: always
+to invent new visual language. Slides 04 and 54 are builder aids: always
 delete them from a shipping deck.
 
 ## Non-negotiables (memorize before building)
@@ -50,6 +50,11 @@ delete them from a shipping deck.
 10. The logo is never placed on brand red, never restyled, never re-typeset.
     Use the supplied lockup PNGs only. Keep clear space of 1 S (the height of
     the ULMA symbol square) on all sides.
+11. The line motif is equipment silhouette glyphs (v0.4 6.A.10), never the
+    retired abstract wireframe. Glyphs inherit surface text color: neutral
+    #9BA1A7 on dark, ink on light; never white on dark, never filled, never
+    per-station recolored, never below 40 px. A product-line glyph always
+    carries its label. Detail in `references/brand-system.md`.
 
 ## Workflow
 
@@ -91,11 +96,12 @@ mid-deck except: full-bleed photo slides (mode-neutral), the Aura navy slide,
 and covers/closers which exist in both modes.
 
 Open `references/slide-archetypes.md` and map every headline in the chain to
-a template slide number. The 54 archetypes cover: covers (dark, light,
-co-branded), agendas, dividers, statements, big number, quotes, full-bleed
-photo, stat bands, before/after, bar and line charts, comparison table,
-evidence quotes, card grids, offerings, machine + spec, machine lineup,
-process motif, timeline, roadmap, industries, certifications, do/don't,
+a template slide number. The 55 archetypes cover: covers (dark, light,
+co-branded), agendas, section and product-line dividers, statements, big
+number, quotes, full-bleed photo, stat bands, before/after, bar and line
+charts, comparison table, evidence quotes, card grids, offerings, machine +
+spec, machine lineup, glyph process motif, timeline, roadmap, industries,
+certifications, do/don't,
 bios (hero, dual, team grid, speakers), partner walls with marks, built-with
 strip, partner detail, Aura, Aura Edge event, demo frame, case study,
 commercial options, FAQ, summary, closings, contact, appendix, and back
@@ -149,6 +155,8 @@ While filling content:
    Check: headline chain reads as the argument; one red element per slide;
    no text overflow; squint test (the intended element dominates); partner
    marks on neutral cards; Aura containment; the last slide is the ask.
+   Glyph spot check: one dark slide reads glyph neutral #9BA1A7, one light
+   slide reads ink glyphs, and no closing carries a red dot.
 4. Report unresolved [GET] items and placeholders to the user as a short
    gap list. Missing inputs never block a draft; they get tagged and listed.
 
@@ -170,10 +178,18 @@ Deliver the .pptx plus the gap list. If humans will edit it, include
 
 ## Governance notes
 
-The brand book is v0.3, draft for marketing ratification. Figures marked
-[GET] in the template are illustrative until the product team supplies
-verified specs. Aura and Aura Edge naming is subject to counsel clearance;
-the deck asserts no trademark availability. The interim vector lockups in
-`assets/logos/` were rebuilt from the in-use site mark and stand in until
-the commissioned vector master ships; flag this when a deck goes to print
-or large format.
+The brand book is v0.4. The equipment glyph system (6.A.10) is CONFIRMED
+canon. Figures marked [GET] in the template are illustrative until the
+product team supplies verified specs. Aura and Aura Edge naming is subject
+to counsel clearance; the deck asserts no trademark availability. The
+interim vector lockups in `assets/logos/` were rebuilt from the in-use site
+mark and stand in until the commissioned vector master ships; flag this
+when a deck goes to print or large format.
+
+Open items awaiting ratification or input (flag when relevant):
+- `#FF5A46` dark-surface eyebrow token: PROPOSED in v0.4, not yet ratified.
+  Applied to dark eyebrows in the template; carry it on the open list.
+- glyph-case-packer and glyph-palletizer: authored interim geometry
+  (CONFIRMED). GET real machine references to true them up.
+- Verified per-product specs, partner-approved vector marks, approved
+  customer quotes, and commissioned photography, all as tagged [GET].
