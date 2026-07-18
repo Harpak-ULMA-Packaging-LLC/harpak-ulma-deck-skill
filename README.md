@@ -48,13 +48,30 @@ the surface text color (neutral on dark, ink on light).
 
 1. Install the fonts once: `assets/fonts/` (Archivo, Inter, JetBrains
    Mono; free, SIL OFL). Instructions in `assets/fonts/FONTS.md`.
-2. Open `assets/template/Harpak-ULMA-Deck-Template.pptx`.
+2. Open `assets/template/Harpak-ULMA-Deck-Template.pptx`. Its images are
+   embedded, so it opens ready to edit with no setup.
 3. Keep the slides you need, duplicate archetypes for more, refill the
    text. The speaker notes on every slide tell you what to change and what
    to leave alone.
 4. Delete slides 04 (index) and 54 (cheat sheet) before presenting, and
    resolve every visible [GET] tag: those mark figures that need verified
    values.
+
+## Regenerate assets (only if rebuilding decks in code)
+
+To keep the source tree small and reviewable, the repo commits only the
+asset masters: one monochrome PNG per icon (`assets/icons/*-ink.png`), the
+eight equipment glyph SVGs (`assets/glyphs/`), and the photo scrims. The
+colored icon variants, glyph PNGs, and line-motif strips are generated:
+
+```bash
+pip install pillow cairosvg
+python scripts/render_assets.py
+```
+
+You only need this when rebuilding a deck with `scripts/build_template.js`.
+Opening the shipped `.pptx` does not require it. (The installable `.skill`
+release ships every asset pre-rendered, so it works with no render step.)
 
 ## Use it with Claude
 
@@ -102,11 +119,13 @@ items. Exit code 1 on any FAIL. Run it before anything ships.
 ```
 SKILL.md               The Claude skill: workflow and rules
 references/            Brand system, archetype map, voice, partner/Aura rules
-scripts/               brand_check.py (QA), tokens.js, build_template.js
-assets/template/       The 55-slide .pptx template
+scripts/               brand_check.py (QA), tokens.js, build_template.js,
+                       render_assets.py (regenerates colored assets)
+assets/template/       The 55-slide .pptx template (images embedded)
 assets/fonts/          Brand fonts + install kit + OFL license
-assets/glyphs|glyph-png/   Equipment silhouette glyphs (v0.4 6.A.10)
-assets/logos|motif|icons|photos|partners/
+assets/glyphs/         Eight equipment glyph SVG masters (v0.4 6.A.10)
+assets/icons/          Icon masters (*-ink.png); colors regenerate
+assets/logos|motif|photos|partners/   Lockups, scrims, photography, marks
 evals/                 Test prompt and benchmark from skill development
 docs/preview/          Rendered previews used above
 ```

@@ -72,6 +72,19 @@ If the deliverable will be edited by humans, also hand them
 `assets/fonts/FONTS.md` (the install kit). Without the fonts, PowerPoint
 substitutes and the deck loses its voice.
 
+Assets: this skill package ships the colored icons, glyph PNGs, and motif
+strips ready to use. If you are working from a fresh clone of the git repo
+(which commits only the masters to stay small), regenerate them once before
+rebuilding a deck:
+
+```bash
+python <skill>/scripts/render_assets.py   # recolors icons, renders glyphs, composes motif
+```
+
+Opening the shipped template.pptx needs none of this; its images are
+embedded. The render step matters only when rebuilding via
+`scripts/build_template.js`.
+
 ### Step 1. Spine before slides
 
 Answer in writing before touching the template:
