@@ -1,0 +1,10 @@
+The fonts redistributed with this template are licensed under the SIL Open
+Font License, Version 1.1:
+
+- Archivo. Copyright 2019 The Archivo Project Authors (Omnibus-Type).
+- Inter. Copyright 2016 The Inter Project Authors (Rasmus Andersson).
+- JetBrains Mono. Copyright 2020 The JetBrains Mono Project Authors.
+
+The OFL allows the licensed fonts to be used, studied, modified and
+redistributed freely as long as they are not sold by themselves. Full
+license text: https://openfontlicense.org

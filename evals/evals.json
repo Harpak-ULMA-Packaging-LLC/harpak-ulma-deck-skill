@@ -1,0 +1,11 @@
+{
+  "skill_name": "harpak-ulma-decks",
+  "evals": [
+    {
+      "id": 0,
+      "prompt": "Build a customer pitch deck for Harpak-ULMA (the packaging line integrator). Audience: plant engineering and operations leadership at a frozen-seafood processor running 11 SKUs on mostly manual lines; they are evaluating an integrated multi-SKU packaging line. 30-minute meeting, about 10 live slides, dark premium look. The deck should argue: variety is a systems problem, recipe-driven changeover is the fix, Harpak-ULMA integrates Mondini sealing, Rockwell controls, and ULMA machines as one accountable line, Aura Edge flags faults before stops, and close by asking them to approve a two-week line assessment.",
+      "expected_output": "A .pptx that follows Brand Book v0.3: dark system, Archivo/Inter/JetBrains Mono, one red accent per slide, claim headlines, partner compliance, Aura containment, ends on the ask.",
+      "files": []
+    }
+  ]
+}

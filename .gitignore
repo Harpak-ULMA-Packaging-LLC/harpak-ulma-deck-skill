@@ -1,0 +1,9 @@
+.DS_Store
+Thumbs.db
+~$*.pptx
+*.tmp
+node_modules/
+__pycache__/
+unpacked/
+*.pdf
+!docs/**/*.pdf
