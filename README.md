@@ -79,9 +79,8 @@ The repo root is a Claude Agent Skill.
 
 - Claude Code: clone into your skills directory, or
   `npx skills add <this-repo-url>`.
-- claude.ai and Cowork: download `harpak-ulma-decks.skill` from this
-  repo's Releases page and upload it to your skills, or attach the repo
-  to a project.
+- claude.ai and Cowork: download `dist/harpak-ulma-decks.skill` from this
+  repo and upload it to your skills, or attach the repo to a project.
 
 Then ask for any Harpak-ULMA deck ("build the Pack Expo session deck",
 "turn this outline into a customer pitch"). The skill plans the narrative
@@ -126,6 +125,7 @@ assets/fonts/          Brand fonts + install kit + OFL license
 assets/glyphs/         Eight equipment glyph SVG masters (v0.4 6.A.10)
 assets/icons/          Icon masters (*-ink.png); colors regenerate
 assets/logos|motif|photos|partners/   Lockups, scrims, photography, marks
+dist/                  Installable harpak-ulma-decks.skill (claude.ai upload)
 evals/                 Test prompt and benchmark from skill development
 docs/preview/          Rendered previews used above
 ```
